@@ -46,8 +46,11 @@ Complejidad temporal (tiempo).
 Complejidad espacial (memoria).
 
 🧩 Estructura del Código
+
 bash
+
 Copiar código
+
 📁 Proyecto_Rutas_Entrega
 │
 ├── pr.py                          # Archivo principal del programa
@@ -78,9 +81,13 @@ Math, Random, Time, Tracemalloc – Para el cálculo, simulación y medición de
 Autores
 
 Universidad Tecnológica de Panamá
+
 Facultad de Ingeniería de Sistemas Computacionales
+
 Materia: Análisis y Diseño de Algoritmos
+
 Año: 2025
 
 📄 Licencia
+
 Proyecto académico — uso exclusivo con fines educativos.
