@@ -20,7 +20,6 @@ El programa también genera una **visualización interactiva en HTML** que permi
    python pr.py
 Seleccionar una opción del menú principal:
 
-Copiar código
 1) Ejecutar algoritmo principal
 2) Consultar rutas y distancias
 3) Ejecutar análisis empírico
@@ -49,7 +48,7 @@ Complejidad espacial (memoria).
 
 bash
 
-Copiar código
+
 
 📁 Proyecto_Rutas_Entrega
 │
