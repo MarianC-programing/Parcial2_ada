@@ -75,7 +75,8 @@ Plotly – Para la generación de gráficos interactivos.
 
 Math, Random, Time, Tracemalloc – Para el cálculo, simulación y medición de rendimiento.
 
-👥 Autores
+Autores
+
 Universidad Tecnológica de Panamá
 Facultad de Ingeniería de Sistemas Computacionales
 Materia: Análisis y Diseño de Algoritmos
