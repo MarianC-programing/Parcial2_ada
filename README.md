@@ -17,7 +17,7 @@ El programa también genera una **visualización interactiva en HTML** que permi
 
 1. Ejecutar el archivo principal:
    ```bash
-   python pr.py
+   python Capa_codigo.py
 Seleccionar una opción del menú principal:
 
 1) Ejecutar algoritmo principal
