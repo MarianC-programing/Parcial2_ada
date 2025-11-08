@@ -149,7 +149,7 @@ def asignar_rutas():
         ruta_asignada = rutas_asignadas_global.get(c + 1, list(range(inicio, fin + 1)) + [0])
         print(f"\nConductor {c + 1}:")
         print(f"  Paquetes asignados: {paquetes}")
-        print(f"  Ruta: {ruta_asignada}")
+        print(f"  Ruta: [{' → '.join(map(str, ruta_asignada))}]")
         
         # Calcular distancia total para la ruta asignada
         distancia_total = 0
