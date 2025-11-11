@@ -21,19 +21,16 @@ def generar_matriz_automatica(n):
 
 def mostrar_matriz(matriz):
     n = len(matriz)
-    print("\nMatriz de distancias (en kilómetros):")
-    
-    # Imprimir encabezado
-    print("   De/A", end="")
+    print("\n=== MATRIZ DE DISTANCIAS (Origen -> Destino) ===")
+    print("      DESTINO")
+    print("   De/A |", end="")
+    for j in range(n):
+        print(f" {j:2}", end="")
+    print("\n" + "-" * (8 + 3 * n))
     for i in range(n):
-        print(f" {i:3}", end="")
-    print()  # Nueva línea
-    
-    # Imprimir filas con índices
-    for i in range(n):
-        print(f"     {i}", end="")  # Índice de fila
+        print(f"     {i} |", end="")
         for j in range(n):
-            print(f" {matriz[i][j]:3}", end="")
+            print(f" {matriz[i][j]:2}", end="")
         print()
 
 
@@ -64,49 +61,52 @@ def mostrar_rutas_disponibles(n):
     """Muestra las rutas disponibles basadas en las filas de la matriz."""
     print("\n=== RUTAS DISPONIBLES ===")
     for i in range(n):
-        ruta = list(range(n))  # Todos los puntos en orden
-        ruta.pop(i)  # Eliminar el punto actual
-        print(f"Ruta {i + 1}: 0 -> {' -> '.join(map(str, ruta))} -> 0")
+        ruta = list(range(n))
+        ruta.pop(i)
+        print(f"Ruta {i + 1}: 0 → {' → '.join(map(str, ruta))} → 0")
     print("=" * 40)
 
 def asignar_rutas_manual(num_conductores, n):
     """Permite asignar rutas predefinidas a los conductores."""
     rutas = {}
-    
-    # Mostrar las rutas disponibles
-    mostrar_rutas_disponibles(n)
-    
+    # Solo mostrar tantas rutas como conductores si hay menos conductores que filas
+    mostrar_rutas_disponibles(num_conductores if num_conductores < n else n)
     print("\n=== Asignación de Rutas a Conductores ===")
     print("Para cada conductor, indique el número de ruta que desea asignarle")
-    
-    rutas_asignadas = set()  # Para llevar control de rutas ya asignadas
-    
+    rutas_asignadas = []
+    if num_conductores > n:
+        print("\nHay más conductores que rutas disponibles. Las rutas se asignarán de forma cíclica.")
     for i in range(num_conductores):
-        while True:
-            try:
-                ruta_num = int(input(f"Número de ruta para Conductor {i + 1}: "))
-                if ruta_num < 1 or ruta_num > n:
-                    print(f"El número de ruta debe estar entre 1 y {n}")
-                    continue
-                    
-                if ruta_num in rutas_asignadas:
-                    print(" Esta ruta ya fue asignada a otro conductor")
-                    continue
-                    
-                # Crear la ruta basada en el número seleccionado
-                puntos = list(range(n))  # Todos los puntos
-                punto_inicio = ruta_num - 1
-                puntos.pop(punto_inicio)  # Eliminar el punto de inicio
-                ruta_completa = [0] + puntos + [0]
-                
-                rutas[i + 1] = ruta_completa
-                rutas_asignadas.add(ruta_num)
-                print(f"Ruta {ruta_num} asignada al Conductor {i + 1}")
-                break
-                
-            except ValueError:
-                print("Por favor, ingrese un número válido")
-    
+        if num_conductores > n:
+            ruta_num = (i % n) + 1
+            puntos = list(range(n))
+            punto_inicio = ruta_num - 1
+            puntos.pop(punto_inicio)
+            ruta_completa = [0] + puntos + [0]
+            # Almacenar tanto el número de ruta como la secuencia
+            rutas[i + 1] = {"num": ruta_num, "seq": ruta_completa}
+            rutas_asignadas.append(ruta_num)
+            print(f"Conductor {i + 1}: Ruta {ruta_num} asignada automáticamente.")
+        else:
+            while True:
+                try:
+                    ruta_num = int(input(f"Número de ruta para Conductor {i + 1} (1-{num_conductores}): "))
+                    if ruta_num < 1 or ruta_num > num_conductores:
+                        print(f"El número de ruta debe estar entre 1 y {num_conductores}")
+                        continue
+                    if ruta_num in rutas_asignadas:
+                        print(" Esta ruta ya fue asignada a otro conductor")
+                        continue
+                    puntos = list(range(n))
+                    punto_inicio = ruta_num - 1
+                    puntos.pop(punto_inicio)
+                    ruta_completa = [0] + puntos + [0]
+                    rutas[i + 1] = {"num": ruta_num, "seq": ruta_completa}
+                    rutas_asignadas.append(ruta_num)
+                    print(f"Ruta {ruta_num} asignada al Conductor {i + 1}")
+                    break
+                except ValueError:
+                    print("Por favor, ingrese un número válido")
     return rutas
 
 def asignar_rutas():
@@ -146,18 +146,24 @@ def asignar_rutas():
         distancia_total = sum(matriz_global[i][i + 1] for i in range(inicio, fin))
         distancia_total += matriz_global[fin][0]
 
-        ruta_asignada = rutas_asignadas_global.get(c + 1, list(range(inicio, fin + 1)) + [0])
+        ruta_entry = rutas_asignadas_global.get(c + 1, list(range(inicio, fin + 1)) + [0])
+        # Si la entrada es un dict con 'seq', extraemos la secuencia
+        if isinstance(ruta_entry, dict) and 'seq' in ruta_entry:
+            ruta_asignada = ruta_entry['seq']
+        else:
+            ruta_asignada = ruta_entry
+
         print(f"\nConductor {c + 1}:")
         print(f"  Paquetes asignados: {paquetes}")
         print(f"  Ruta: [{' → '.join(map(str, ruta_asignada))}]")
-        
+
         # Calcular distancia total para la ruta asignada
         distancia_total = 0
         for i in range(len(ruta_asignada) - 1):
             origen = ruta_asignada[i]
             destino = ruta_asignada[i + 1]
             distancia_total += matriz_global[origen][destino]
-            
+
         print(f"  Distancia total recorrida: {distancia_total} km")
 
     print("\nAsignación completada correctamente.\n")
@@ -238,37 +244,51 @@ def consultar_rutas():
             if rutas_asignadas_global:
                 print("\n=== RUTAS ASIGNADAS ===")
                 total_km_asignados = 0
-                
-                for conductor, ruta in rutas_asignadas_global.items():
-                    distancia = sum(matriz_global[ruta[i]][ruta[i+1]] 
-                                  for i in range(len(ruta)-1))
+                # Recolectar números de ruta asignados y mostrar detalles
+                rutas_asignadas_nums = []
+                for conductor, entry in rutas_asignadas_global.items():
+                    # extraer secuencia y número si están presentes
+                    if isinstance(entry, dict) and 'seq' in entry:
+                        seq = entry['seq']
+                        num = entry.get('num')
+                    else:
+                        seq = entry
+                        # intentar deducir el número de ruta: es el punto que falta en la secuencia
+                        full = set(range(n_global))
+                        # considerar solo los puntos intermedios (seq sin los ceros inicial/final)
+                        presentes = set(seq[1:-1])
+                        faltantes = list(full - presentes)
+                        num = (faltantes[0] + 1) if len(faltantes) == 1 else None
+
+                    if num is not None:
+                        rutas_asignadas_nums.append(num)
+
+                    distancia = sum(matriz_global[seq[i]][seq[i+1]] for i in range(len(seq)-1))
                     total_km_asignados += distancia
                     print(f"\nConductor {conductor}:")
-                    print(f"  Ruta: {' → '.join(map(str, ruta))}")
+                    print(f"  Ruta: {' → '.join(map(str, seq))}")
                     print(f"  Distancia total: {distancia} km")
-                
+
                 print(f"\nTotal kilómetros en rutas asignadas: {total_km_asignados} km")
-                
-                # Mostrar rutas no asignadas
-                print("\n=== RUTAS NO ASIGNADAS ===")
-                rutas_asignadas_nums = {ruta[1] for ruta in rutas_asignadas_global.values() 
-                                      if len(ruta) > 2}
-                
-                total_km_no_asignados = 0
-                for i in range(n_global):
-                    if i not in rutas_asignadas_nums:
+
+                # Determinar rutas realmente no asignadas
+                rutas_no_asignadas = [i for i in range(n_global) if (i+1) not in rutas_asignadas_nums]
+                if rutas_no_asignadas:
+                    print("\n=== RUTAS NO ASIGNADAS ===")
+                    total_km_no_asignados = 0
+                    for i in rutas_no_asignadas:
                         puntos = list(range(n_global))
                         puntos.pop(i)
                         ruta = [0] + puntos + [0]
-                        distancia = sum(matriz_global[ruta[j]][ruta[j+1]] 
-                                      for j in range(len(ruta)-1))
+                        distancia = sum(matriz_global[ruta[j]][ruta[j+1]] for j in range(len(ruta)-1))
                         total_km_no_asignados += distancia
                         print(f"\nRuta {i + 1}:")
                         print(f"  Secuencia: {' → '.join(map(str, ruta))}")
                         print(f"  Distancia: {distancia} km")
-                
-                print(f"\nTotal kilómetros en rutas no asignadas: {total_km_no_asignados} km")
-                print(f"Total kilómetros global: {total_km_asignados + total_km_no_asignados} km")
+                    print(f"\nTotal kilómetros en rutas no asignadas: {total_km_no_asignados} km")
+                    print(f"Total kilómetros global: {total_km_asignados + total_km_no_asignados} km")
+                else:
+                    print("\nNo hay rutas no asignadas. Todas las rutas han sido asignadas al menos una vez.")
             else:
                 print("\n No hay rutas asignadas todavía.")
                 mostrar_rutas_disponibles(n_global)
